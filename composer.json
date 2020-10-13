@@ -8,5 +8,7 @@
             "email": "jslmorrison@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "react/http": "^1.1"
+    }
 }
