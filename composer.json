@@ -1,0 +1,12 @@
+{
+    "name": "jslmorrison/asyncy",
+    "description": "ReactPHP jiggery-pokery",
+    "type": "project",
+    "authors": [
+        {
+            "name": "John Morrison",
+            "email": "jslmorrison@gmail.com"
+        }
+    ],
+    "require": {}
+}
