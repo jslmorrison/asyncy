@@ -3,15 +3,19 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use App\Products\Controller\ProductsController;
+use App\Router;
 use App\Users\Controller\UsersController;
+use FastRoute\DataGenerator\GroupCountBased;
+use FastRoute\RouteCollector;
+use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Server;
 use React\Http\Message\Response;
 
 $loop = \React\EventLoop\Factory::create();
 
-$dispatcher = FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $routes) {
-    $routes->get('/', function (ServerRequestInterface $request) {
+$routes = new RouteCollector(new Std(), new GroupCountBased());
+$routes->get('/', function (ServerRequestInterface $request) {
         return new Response(
             200,
             [
@@ -20,33 +24,10 @@ $dispatcher = FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $ro
             ]
         );
     });
-    $routes->get('/users', new UsersController());
-    $routes->get('/products', new ProductsController());
-});
+$routes->get('/users', new UsersController());
+$routes->get('/products', new ProductsController());
 
-$server = new Server($loop, function (ServerRequestInterface $request) use ($dispatcher) {
-
-    $routeInfo = $dispatcher->dispatch(
-        $request->getMethod(),
-        $request->getUri()->getPath()
-    );
-
-    switch ($routeInfo[0]) {
-        case FastRoute\Dispatcher::NOT_FOUND:
-            return new Response(404, ['Content-Type' => 'text/plain'], 'Not found');
-        break;
-        case FastRoute\Dispatcher::FOUND:
-            return $routeInfo[1]($request);
-        break;
-        case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-            return new Response(405, ['Content-Type' => 'text/plain'], 'Not allowed');
-        break;
-        default:
-            throw new \RuntimeException('Oops - routing is broken');
-        break;
-    }
-});
-
+$server = new Server($loop, new Router($routes));
 $socket = new \React\Socket\Server(8080, $loop);
 $server->listen($socket);
 
