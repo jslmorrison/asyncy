@@ -2,6 +2,8 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+use App\Products\Controller\ProductsController;
+use App\Users\Controller\UsersController;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Server;
 use React\Http\Message\Response;
@@ -18,24 +20,8 @@ $dispatcher = FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $ro
             ]
         );
     });
-    $routes->get('/users', function (ServerRequestInterface $request) {
-        return new Response(
-            200,
-            [
-                'Content-Type' => 'application/json',
-                json_encode(['message' => 'Response from GET users collection'])
-            ]
-        );
-    });
-    $routes->get('/products', function (ServerRequestInterface $request) {
-        return new Response(
-            200,
-            [
-                'Content-Type' => 'application/json',
-                json_encode(['message' => 'Response from GET products collection'])
-            ]
-        );
-    });
+    $routes->get('/users', new UsersController());
+    $routes->get('/products', new ProductsController());
 });
 
 $server = new Server($loop, function (ServerRequestInterface $request) use ($dispatcher) {
