@@ -11,8 +11,10 @@ use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Server;
 use React\Http\Message\Response;
+use WyriHaximus\React\PSR3\Stdio\StdioLogger;
 
 $loop = \React\EventLoop\Factory::create();
+$logger = StdioLogger::create($loop)->withNewLine(true);
 
 $routes = new RouteCollector(new Std(), new GroupCountBased());
 $routes->get('/', function (ServerRequestInterface $request) {
@@ -23,7 +25,7 @@ $routes->get('/', function (ServerRequestInterface $request) {
                 json_encode(['message' => 'Hello world'])
             ]
         );
-    });
+});
 $routes->get('/users', new UsersController());
 $routes->get('/products', new ProductsController());
 
@@ -33,9 +35,10 @@ $server->listen($socket);
 
 $server->on(
     'error',
-    function (\Throwable $e) {
-        echo 'Error: ' . $e->getMessage() . PHP_EOL;
+    function (\Throwable $e) use ($logger) {
+        $logger->error('Sorry Dave, i cant do that.');
     }
 );
 
+$logger->info('Server started, listening on ' . $socket->getAddress());
 $loop->run();

@@ -10,7 +10,8 @@
     ],
     "require": {
         "react/http": "^1.1",
-        "nikic/fast-route": "^1.3"
+        "nikic/fast-route": "^1.3",
+        "wyrihaximus/react-psr-3-stdio": "^2.1"
     },
     "autoload": {
         "psr-4": {
