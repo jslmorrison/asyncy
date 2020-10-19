@@ -14,6 +14,15 @@ use React\Http\Message\Response;
 use WyriHaximus\React\PSR3\Stdio\StdioLogger;
 
 $loop = \React\EventLoop\Factory::create();
+
+$containerBuilder = new \DI\ContainerBuilder();
+$containerBuilder->addDefinitions(
+    [
+        'user.finder' => \DI\autowire(\App\Users\Finder\MysqlUserFinder::class)
+    ]
+);
+$container = $containerBuilder->build();
+
 $logger = StdioLogger::create($loop)->withNewLine(true);
 
 $routes = new RouteCollector(new Std(), new GroupCountBased());
@@ -26,7 +35,7 @@ $routes->get('/', function (ServerRequestInterface $request) {
             ]
         );
 });
-$routes->get('/users', new UsersController());
+$routes->get('/users', new UsersController($container->get('user.finder')));
 $routes->get('/products', new ProductsController());
 
 $server = new Server($loop, new Router($routes));
